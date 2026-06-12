@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A one-click WhatsApp rental payment calculator for property agents."
+    />
+    <meta name="theme-color" content="#102a43" />
+    <title>Rental Payment Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="Rental calculator home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4v-9.5Z" />
+            </svg>
+          </span>
+          <span>
+            <strong>RentFlow</strong>
+            <small>Property Agent Tool</small>
+          </span>
+        </a>
+        <span class="status-pill">
+          <span class="status-dot"></span>
+          Ready to calculate
+        </span>
+      </header>
+
+      <main>
+        <section class="intro">
+          <p class="eyebrow">WhatsApp Message Generator</p>
+          <h1>Rental payment details,<br /><span>ready in one click.</span></h1>
+          <p class="intro-copy">
+            Enter the property, monthly rental, and payment structure. We will
+            calculate the full breakdown and prepare a professional WhatsApp
+            message.
+          </p>
+        </section>
+
+        <section class="calculator-grid" aria-label="Rental payment calculator">
+          <div class="form-card">
+            <div class="card-heading">
+              <span class="step-number">01</span>
+              <div>
+                <h2>Property Details</h2>
+                <p>Complete the details below.</p>
+              </div>
+            </div>
+
+            <form id="calculator-form" novalidate>
+              <label for="property-name">
+                Property Name / Unit
+                <span>Required</span>
+              </label>
+              <div class="input-wrap">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M3.5 21h17M5 21V8.5L12 3l7 5.5V21M9 12h6M9 16h6"
+                  />
+                </svg>
+                <input
+                  id="property-name"
+                  name="propertyName"
+                  type="text"
+                  value="The Horizon, Unit G-33-15"
+                  placeholder="e.g. Mercu Jalil, Unit B-21-17"
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <p class="field-error" id="property-error"></p>
+
+              <label for="monthly-rental">
+                Monthly Rental
+                <span>RM0 – RM18,000</span>
+              </label>
+              <div class="input-wrap amount-input">
+                <strong>RM</strong>
+                <input
+                  id="monthly-rental"
+                  name="monthlyRental"
+                  type="text"
+                  value="1,500"
+                  placeholder="1,500"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  required
+                />
+                <small>/ month</small>
+              </div>
+              <p class="field-error" id="rental-error"></p>
+
+              <fieldset class="payment-structure">
+                <legend>
+                  Payment Structure
+                  <span>Security + Advance + Utilities</span>
+                </legend>
+                <div class="payment-options">
+                  <label class="payment-option">
+                    <input
+                      type="radio"
+                      name="paymentStructure"
+                      value="2-1-0.5"
+                      checked
+                    />
+                    <span class="option-formula">2 + 1 + 0.5</span>
+                    <span class="option-detail">2 mo. + 1 mo. + 1/2 mo.</span>
+                  </label>
+                  <label class="payment-option">
+                    <input
+                      type="radio"
+                      name="paymentStructure"
+                      value="1-1-0.5"
+                    />
+                    <span class="option-formula">1 + 1 + 0.5</span>
+                    <span class="option-detail">1 mo. + 1 mo. + 1/2 mo.</span>
+                  </label>
+                  <label class="payment-option">
+                    <input
+                      type="radio"
+                      name="paymentStructure"
+                      value="2-1-1"
+                    />
+                    <span class="option-formula">2 + 1 + 1</span>
+                    <span class="option-detail">2 mo. + 1 mo. + 1 mo.</span>
+                  </label>
+                </div>
+              </fieldset>
+            </form>
+
+            <div class="calculation-note">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 10v6M12 7h.01" />
+              </svg>
+              <p>
+                Agreement and stamping fee is based on a
+                <strong>1-year tenancy</strong>, effective May 2026.
+              </p>
+            </div>
+
+            <div class="quick-summary" aria-label="Calculation summary">
+              <div>
+                <span>Move-In Total</span>
+                <strong id="move-in-summary">RM5,600</strong>
+              </div>
+              <div>
+                <span>Booking Amount</span>
+                <strong id="booking-summary">RM1,970</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-card">
+            <div class="preview-heading">
+              <div class="whatsapp-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M20.5 11.6a8.3 8.3 0 0 1-12.3 7.3L3.5 20l1.2-4.5a8.3 8.3 0 1 1 15.8-3.9Z"
+                  />
+                  <path
+                    d="M8.1 7.8c.2-.5.5-.5.8-.5h.5l.8 1.9c.1.3 0 .5-.1.7l-.6.8c.8 1.6 2 2.7 3.7 3.5l.8-1c.2-.2.4-.3.7-.2l2 .9c.3.1.4.4.4.7-.1.7-.5 1.4-1.1 1.8-.6.4-1.4.6-2.4.3-1.2-.3-2.8-1-4.5-2.6-1.4-1.3-2.4-2.8-2.8-4-.4-1-.2-1.8.2-2.3.4-.4.8-.6 1.1-.6"
+                  />
+                </svg>
+              </div>
+              <div>
+                <h2>WhatsApp Preview</h2>
+                <p>Formatted and ready to send</p>
+              </div>
+              <span class="live-badge">Live</span>
+            </div>
+
+            <div class="message-window">
+              <div class="chat-topbar">
+                <span class="chat-avatar">MR</span>
+                <span>
+                  <strong>Client Message</strong>
+                  <small>Rental payment breakdown</small>
+                </span>
+              </div>
+              <div class="chat-body">
+                <div class="message-bubble">
+                  <pre id="message-preview" aria-live="polite"></pre>
+                  <span class="message-time">Draft <b>✓✓</b></span>
+                </div>
+              </div>
+            </div>
+
+            <button class="copy-button" id="copy-button" type="button">
+              <svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="12" rx="2" />
+                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2" />
+              </svg>
+              <svg class="check-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m5 12 4 4L19 6" />
+              </svg>
+              <span>Copy WhatsApp Message</span>
+            </button>
+            <p class="copy-hint">
+              Paste directly into WhatsApp after copying.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Rental Payment Calculator</span>
+        <span>Built for faster client communication</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m5 12 4 4L19 6" />
+      </svg>
+      Message copied to clipboard
+    </div>
+  </body>
+</html>
