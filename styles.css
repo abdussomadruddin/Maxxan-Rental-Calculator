@@ -359,6 +359,19 @@ label span {
   gap: 8px;
 }
 
+.tenancy-period {
+  margin-top: 18px;
+}
+
+.tenancy-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tenancy-option {
+  align-content: center;
+  min-height: 51px;
+}
+
 label.payment-option {
   position: relative;
   display: grid;
@@ -779,11 +792,26 @@ footer {
     grid-template-columns: 1fr;
   }
 
+  .tenancy-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   label.payment-option {
     grid-template-columns: 1fr auto;
     align-items: center;
     padding: 12px 14px;
     text-align: left;
+  }
+
+  label.tenancy-option {
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 13px 8px;
+    text-align: center;
+  }
+
+  .tenancy-option .option-formula {
+    font-size: 12px;
   }
 
   .payment-option .option-detail {

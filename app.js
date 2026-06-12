@@ -3,6 +3,9 @@ const rentalInput = document.querySelector("#monthly-rental");
 const paymentStructureInputs = document.querySelectorAll(
   'input[name="paymentStructure"]',
 );
+const tenancyPeriodInputs = document.querySelectorAll(
+  'input[name="tenancyPeriod"]',
+);
 const messagePreview = document.querySelector("#message-preview");
 const copyButton = document.querySelector("#copy-button");
 const copyButtonLabel = copyButton.querySelector("span");
@@ -10,18 +13,19 @@ const moveInSummary = document.querySelector("#move-in-summary");
 const bookingSummary = document.querySelector("#booking-summary");
 const propertyError = document.querySelector("#property-error");
 const rentalError = document.querySelector("#rental-error");
+const tenancyNote = document.querySelector("#tenancy-note");
 const toast = document.querySelector("#toast");
 
 const MAX_RENTAL = 18000;
 const SST_RATE = 0.08;
 
 const agreementFeeBands = [
-  { maximum: 2000, fee: 350 },
-  { maximum: 5000, fee: 550 },
-  { maximum: 9000, fee: 650 },
-  { maximum: 12000, fee: 850 },
-  { maximum: 15000, fee: 950 },
-  { maximum: 18000, fee: 1150 },
+  { maximum: 2000, oneYearFee: 350, twoYearFee: 500 },
+  { maximum: 5000, oneYearFee: 550, twoYearFee: 800 },
+  { maximum: 9000, oneYearFee: 650, twoYearFee: 1100 },
+  { maximum: 12000, oneYearFee: 850, twoYearFee: 1350 },
+  { maximum: 15000, oneYearFee: 950, twoYearFee: 1650 },
+  { maximum: 18000, oneYearFee: 1150, twoYearFee: 1950 },
 ];
 
 const paymentStructures = {
@@ -62,8 +66,12 @@ function formatCurrency(amount) {
   return `RM${formatNumber(amount)}`;
 }
 
-function getAgreementFee(rental) {
-  return agreementFeeBands.find((band) => rental <= band.maximum)?.fee ?? 0;
+function getAgreementFee(rental, tenancyYears) {
+  const band = agreementFeeBands.find((item) => rental <= item.maximum);
+  if (!band) {
+    return 0;
+  }
+  return tenancyYears === 2 ? band.twoYearFee : band.oneYearFee;
 }
 
 function getSelectedPaymentStructure() {
@@ -73,6 +81,13 @@ function getSelectedPaymentStructure() {
   return paymentStructures[selected?.value] ?? paymentStructures["2-1-0.5"];
 }
 
+function getSelectedTenancyPeriod() {
+  const selected = document.querySelector(
+    'input[name="tenancyPeriod"]:checked',
+  );
+  return Number(selected?.value) === 2 ? 2 : 1;
+}
+
 function formatMonthLabel(months) {
   if (months === 0.5) {
     return "1/2 month";
@@ -80,11 +95,11 @@ function formatMonthLabel(months) {
   return `${formatNumber(months)} ${months === 1 ? "month" : "months"}`;
 }
 
-function calculate(rental, structure) {
+function calculate(rental, structure, tenancyYears) {
   const securityDeposit = rental * structure.securityMonths;
   const utilitiesDeposit = rental * structure.utilitiesMonths;
   const advanceRental = rental * structure.advanceMonths;
-  const agreementFee = getAgreementFee(rental);
+  const agreementFee = getAgreementFee(rental, tenancyYears);
   const sst = advanceRental * SST_RATE;
   const refundableDeposit = securityDeposit + utilitiesDeposit;
   const totalMoveIn =
@@ -102,6 +117,7 @@ function calculate(rental, structure) {
     totalMoveIn,
     booking,
     balance,
+    tenancyYears,
     ...structure,
   };
 }
@@ -117,10 +133,10 @@ Rental: *${formatCurrency(rental)}/month*
 • Security Deposit, ${formatMonthLabel(amounts.securityMonths)}, refundable: ${formatCurrency(amounts.securityDeposit)}
 • Utilities Deposit, ${formatMonthLabel(amounts.utilitiesMonths)}, refundable: ${formatCurrency(amounts.utilitiesDeposit)}
 • Advance Rental, ${formatMonthLabel(amounts.advanceMonths)}: ${formatCurrency(amounts.advanceRental)}
-• Agreement & Stamping Fee, 1-year tenancy: ${formatCurrency(amounts.agreementFee)}
+• Agreement & Stamping Fee, ${amounts.tenancyYears}-year tenancy: ${formatCurrency(amounts.agreementFee)}
 
 *Total Refundable Deposit: ${formatCurrency(amounts.refundableDeposit)}*
-Refundable upon completion of the 1-year tenancy, subject to the terms and conditions of the Tenancy Agreement.
+Refundable upon completion of the ${amounts.tenancyYears}-year tenancy, subject to the terms and conditions of the Tenancy Agreement.
 
 *Unit Booking: ${formatCurrency(amounts.booking)}*
 
@@ -175,11 +191,17 @@ function updateCalculator() {
     return;
   }
 
-  const amounts = calculate(rental, getSelectedPaymentStructure());
+  const tenancyYears = getSelectedTenancyPeriod();
+  const amounts = calculate(
+    rental,
+    getSelectedPaymentStructure(),
+    tenancyYears,
+  );
   currentMessage = buildMessage(propertyName, rental, amounts);
   messagePreview.textContent = currentMessage;
   moveInSummary.textContent = formatCurrency(amounts.totalMoveIn);
   bookingSummary.textContent = formatCurrency(amounts.booking);
+  tenancyNote.textContent = `${tenancyYears}-year tenancy`;
   copyButton.disabled = false;
   resetCopyState();
 }
@@ -226,6 +248,9 @@ rentalInput.addEventListener("blur", () => {
 });
 rentalInput.addEventListener("focus", () => rentalInput.select());
 paymentStructureInputs.forEach((input) =>
+  input.addEventListener("change", updateCalculator),
+);
+tenancyPeriodInputs.forEach((input) =>
   input.addEventListener("change", updateCalculator),
 );
 copyButton.addEventListener("click", copyMessage);
