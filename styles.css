@@ -696,6 +696,10 @@ label.payment-option:hover {
   text-align: center;
 }
 
+footer {
+  min-height: 65px;
+}
+
 .toast {
   position: fixed;
   z-index: 20;
