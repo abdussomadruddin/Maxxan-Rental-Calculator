@@ -38,7 +38,7 @@ const agreementFeeBands = [
 
 const paymentStructures = {
   "1-0.5-room": {
-    securityMonths: 1,
+    securityMonths: 0,
     advanceMonths: 1,
     utilitiesMonths: 0.5,
   },
