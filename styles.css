@@ -132,6 +132,130 @@ select {
   box-shadow: 0 0 0 4px rgba(18, 168, 125, 0.12);
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.rental-mode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+}
+
+.rental-mode-label {
+  color: var(--navy-700);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rental-tabs {
+  position: relative;
+  display: grid;
+  width: min(360px, 100%);
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.54), rgba(220, 247, 237, 0.25)),
+    rgba(227, 237, 242, 0.48);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 0 rgba(16, 42, 67, 0.06),
+    0 12px 32px rgba(16, 42, 67, 0.11);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+.rental-tabs::before {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 28% 12%, rgba(255, 255, 255, 0.98), transparent 28%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.3));
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.98),
+    inset 0 -8px 16px rgba(18, 168, 125, 0.08),
+    0 6px 18px rgba(16, 42, 67, 0.14),
+    0 0 0 1px rgba(16, 42, 67, 0.035);
+  content: "";
+  transition:
+    transform 420ms cubic-bezier(0.2, 0.85, 0.2, 1),
+    box-shadow 240ms ease;
+}
+
+.rental-tabs:has(#room-rental:checked)::before {
+  transform: translateX(100%);
+}
+
+.rental-tabs input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.rental-tabs label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 999px;
+  color: var(--navy-500);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    color 220ms ease,
+    transform 420ms cubic-bezier(0.2, 0.85, 0.2, 1);
+}
+
+.rental-tabs label svg {
+  width: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.rental-tabs:has(#unit-rental:checked) label[for="unit-rental"],
+.rental-tabs:has(#room-rental:checked) label[for="room-rental"] {
+  color: var(--green-700);
+  transform: scale(1.035);
+}
+
+.rental-tabs input:focus-visible + label {
+  outline: 3px solid rgba(18, 168, 125, 0.25);
+  outline-offset: -2px;
+}
+
 .calculator-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
@@ -211,6 +335,14 @@ label span {
   font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+label .label-title {
+  color: var(--navy-900);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .input-wrap {
@@ -325,6 +457,31 @@ label span {
   gap: 8px;
 }
 
+.room-only-option {
+  display: none !important;
+  grid-column: 1 / -1;
+}
+
+.room-only-option.is-visible {
+  display: grid !important;
+}
+
+.payment-options.room-layout .room-only-option {
+  order: 0;
+}
+
+.payment-options.room-layout .structure-1-1-half {
+  order: 1;
+}
+
+.payment-options.room-layout .structure-2-1-half {
+  order: 2;
+}
+
+.payment-options.room-layout .structure-2-1-1 {
+  order: 3;
+}
+
 .tenancy-period {
   margin-top: 18px;
 }
@@ -428,6 +585,10 @@ label.payment-option:hover {
   margin: 0;
   font-size: 11px;
   line-height: 1.5;
+}
+
+.is-hidden {
+  display: none;
 }
 
 .quick-summary {
@@ -721,6 +882,21 @@ footer {
 
   .status-pill {
     display: none;
+  }
+
+  .rental-mode-bar {
+    display: grid;
+    gap: 9px;
+    margin-top: 14px;
+  }
+
+  .rental-tabs {
+    width: 100%;
+  }
+
+  .rental-tabs label {
+    min-height: 44px;
+    padding: 0 10px;
   }
 
   .form-card,

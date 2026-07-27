@@ -32,8 +32,8 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260612-2" />
-    <script src="app.js?v=20260612-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260727-1" />
+    <script src="app.js?v=20260727-1" defer></script>
   </head>
   <body>
     <div class="page-shell">
@@ -59,6 +59,38 @@
       </header>
 
       <main>
+        <div class="rental-mode-bar">
+          <span class="rental-mode-label">Rental Type</span>
+          <fieldset class="rental-tabs">
+            <legend class="visually-hidden">Choose rental type</legend>
+            <input
+              id="unit-rental"
+              name="rentalType"
+              type="radio"
+              value="unit"
+              checked
+            />
+            <label for="unit-rental">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 20V9l8-5 8 5v11M8 20v-6h8v6M9 10h6" />
+              </svg>
+              Unit Rental
+            </label>
+            <input
+              id="room-rental"
+              name="rentalType"
+              type="radio"
+              value="room"
+            />
+            <label for="room-rental">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19v-8M20 19v-6a2 2 0 0 0-2-2H9v8M4 15h16M7 11V8h4a2 2 0 0 1 2 2v1" />
+              </svg>
+              Room Rental
+            </label>
+          </fieldset>
+        </div>
+
         <section class="calculator-grid" aria-label="Rental payment calculator">
           <div class="form-card">
             <div class="card-heading">
@@ -71,7 +103,9 @@
 
             <form id="calculator-form" novalidate>
               <label for="property-name">
-                Property Name / Unit
+                <span class="label-title" id="property-label"
+                  >Property Name / Unit</span
+                >
                 <span>Required</span>
               </label>
               <div class="input-wrap">
@@ -118,7 +152,21 @@
                   <span>Security + Advance + Utilities</span>
                 </legend>
                 <div class="payment-options">
-                  <label class="payment-option">
+                  <label
+                    class="payment-option room-only-option"
+                    id="room-payment-option"
+                  >
+                    <input
+                      type="radio"
+                      name="paymentStructure"
+                      value="1-0.5-room"
+                    />
+                    <span class="option-formula">1 + 0.5</span>
+                    <span class="option-detail"
+                      >1 mo. security + 1/2 mo. utilities</span
+                    >
+                  </label>
+                  <label class="payment-option structure-2-1-half">
                     <input
                       type="radio"
                       name="paymentStructure"
@@ -128,7 +176,7 @@
                     <span class="option-formula">2 + 1 + 0.5</span>
                     <span class="option-detail">2 mo. + 1 mo. + 1/2 mo.</span>
                   </label>
-                  <label class="payment-option">
+                  <label class="payment-option structure-1-1-half">
                     <input
                       type="radio"
                       name="paymentStructure"
@@ -137,7 +185,7 @@
                     <span class="option-formula">1 + 1 + 0.5</span>
                     <span class="option-detail">1 mo. + 1 mo. + 1/2 mo.</span>
                   </label>
-                  <label class="payment-option">
+                  <label class="payment-option structure-2-1-1">
                     <input
                       type="radio"
                       name="paymentStructure"
@@ -149,7 +197,10 @@
                 </div>
               </fieldset>
 
-              <fieldset class="payment-structure tenancy-period">
+              <fieldset
+                class="payment-structure tenancy-period"
+                id="tenancy-period-field"
+              >
                 <legend>
                   Tenancy Period
                   <span>Contract Duration</span>
@@ -189,7 +240,7 @@
                 <strong id="move-in-summary">RM5,600</strong>
               </div>
               <div>
-                <span>Booking Amount</span>
+                <span id="booking-summary-label">Unit Booking</span>
                 <strong id="booking-summary">RM1,970</strong>
               </div>
             </div>

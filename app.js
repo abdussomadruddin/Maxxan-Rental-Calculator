@@ -6,6 +6,8 @@ const paymentStructureInputs = document.querySelectorAll(
 const tenancyPeriodInputs = document.querySelectorAll(
   'input[name="tenancyPeriod"]',
 );
+const rentalTypeInputs = document.querySelectorAll('input[name="rentalType"]');
+const paymentOptions = document.querySelector(".payment-options");
 const messagePreview = document.querySelector("#message-preview");
 const copyButton = document.querySelector("#copy-button");
 const copyButtonLabel = copyButton.querySelector("span");
@@ -14,6 +16,12 @@ const bookingSummary = document.querySelector("#booking-summary");
 const propertyError = document.querySelector("#property-error");
 const rentalError = document.querySelector("#rental-error");
 const tenancyNote = document.querySelector("#tenancy-note");
+const tenancyPeriodField = document.querySelector("#tenancy-period-field");
+const calculationNote = document.querySelector(".calculation-note");
+const propertyLabel = document.querySelector("#property-label");
+const bookingSummaryLabel = document.querySelector("#booking-summary-label");
+const roomPaymentOption = document.querySelector("#room-payment-option");
+const roomPaymentInput = roomPaymentOption.querySelector("input");
 const toast = document.querySelector("#toast");
 
 const MAX_RENTAL = 18000;
@@ -29,6 +37,11 @@ const agreementFeeBands = [
 ];
 
 const paymentStructures = {
+  "1-0.5-room": {
+    securityMonths: 1,
+    advanceMonths: 1,
+    utilitiesMonths: 0.5,
+  },
   "2-1-0.5": {
     securityMonths: 2,
     advanceMonths: 1,
@@ -48,6 +61,19 @@ const paymentStructures = {
 
 let currentMessage = "";
 let toastTimer;
+let activeRentalType = "unit";
+const rentalDrafts = {
+  unit: {
+    propertyName: "The Horizon, Unit G-33-15",
+    monthlyRental: "1,500",
+    paymentStructure: "2-1-0.5",
+  },
+  room: {
+    propertyName: "Master Bedroom, The Horizon, Unit G-33-15",
+    monthlyRental: "800",
+    paymentStructure: "1-1-0.5",
+  },
+};
 
 function parseAmount(value) {
   const sanitized = value.replace(/[^\d.]/g, "");
@@ -88,6 +114,11 @@ function getSelectedTenancyPeriod() {
   return Number(selected?.value) === 2 ? 2 : 1;
 }
 
+function getSelectedRentalType() {
+  const selected = document.querySelector('input[name="rentalType"]:checked');
+  return selected?.value === "room" ? "room" : "unit";
+}
+
 function formatMonthLabel(months) {
   if (months === 0.5) {
     return "1/2 month";
@@ -95,12 +126,13 @@ function formatMonthLabel(months) {
   return `${formatNumber(months)} ${months === 1 ? "month" : "months"}`;
 }
 
-function calculate(rental, structure, tenancyYears) {
+function calculate(rental, structure, tenancyYears, rentalType) {
   const securityDeposit = rental * structure.securityMonths;
   const utilitiesDeposit = rental * structure.utilitiesMonths;
   const advanceRental = rental * structure.advanceMonths;
-  const agreementFee = getAgreementFee(rental, tenancyYears);
-  const sst = advanceRental * SST_RATE;
+  const agreementFee =
+    rentalType === "room" ? 0 : getAgreementFee(rental, tenancyYears);
+  const sst = rentalType === "room" ? 0 : advanceRental * SST_RATE;
   const refundableDeposit = securityDeposit + utilitiesDeposit;
   const totalMoveIn =
     securityDeposit + utilitiesDeposit + advanceRental + agreementFee;
@@ -118,11 +150,22 @@ function calculate(rental, structure, tenancyYears) {
     booking,
     balance,
     tenancyYears,
+    rentalType,
     ...structure,
   };
 }
 
 function buildMessage(propertyName, rental, amounts) {
+  const agreementFeeLine =
+    amounts.rentalType === "unit"
+      ? `\n• Agreement & Stamping Fee, ${amounts.tenancyYears}-year tenancy: ${formatCurrency(amounts.agreementFee)}`
+      : "";
+  const bookingType = amounts.rentalType === "room" ? "Room" : "Unit";
+  const refundableTerm =
+    amounts.rentalType === "room"
+      ? "rental term"
+      : `${amounts.tenancyYears}-year tenancy`;
+
   return `*${propertyName}*
 Rental: *${formatCurrency(rental)}/month*
 
@@ -132,13 +175,12 @@ Rental: *${formatCurrency(rental)}/month*
 
 • Security Deposit, ${formatMonthLabel(amounts.securityMonths)}, refundable: ${formatCurrency(amounts.securityDeposit)}
 • Utilities Deposit, ${formatMonthLabel(amounts.utilitiesMonths)}, refundable: ${formatCurrency(amounts.utilitiesDeposit)}
-• Advance Rental, ${formatMonthLabel(amounts.advanceMonths)}: ${formatCurrency(amounts.advanceRental)}
-• Agreement & Stamping Fee, ${amounts.tenancyYears}-year tenancy: ${formatCurrency(amounts.agreementFee)}
+• Advance Rental, ${formatMonthLabel(amounts.advanceMonths)}: ${formatCurrency(amounts.advanceRental)}${agreementFeeLine}
 
 *Total Refundable Deposit: ${formatCurrency(amounts.refundableDeposit)}*
-Refundable upon completion of the ${amounts.tenancyYears}-year tenancy, subject to the terms and conditions of the Tenancy Agreement.
+Refundable upon completion of the ${refundableTerm}, subject to the terms and conditions of the Tenancy Agreement.
 
-*Unit Booking: ${formatCurrency(amounts.booking)}*
+*${bookingType} Booking: ${formatCurrency(amounts.booking)}*
 
 *Payment to Agency Account:*
 
@@ -165,6 +207,26 @@ function updateCalculator() {
   const propertyName = propertyInput.value.trim();
   const rental = parseAmount(rentalInput.value);
   const rentalIsValid = rental > 0 && rental <= MAX_RENTAL;
+  const rentalType = getSelectedRentalType();
+  const isRoomRental = rentalType === "room";
+
+  tenancyPeriodField.classList.toggle("is-hidden", isRoomRental);
+  calculationNote.classList.toggle("is-hidden", isRoomRental);
+  roomPaymentOption.classList.toggle("is-visible", isRoomRental);
+  paymentOptions.classList.toggle("room-layout", isRoomRental);
+  roomPaymentInput.disabled = !isRoomRental;
+  if (!isRoomRental && roomPaymentInput.checked) {
+    document.querySelector('input[value="2-1-0.5"]').checked = true;
+  }
+  propertyLabel.textContent = isRoomRental
+    ? "Property / Room Name"
+    : "Property Name / Unit";
+  propertyInput.placeholder = isRoomRental
+    ? "e.g. Mercu Jalil, Master Room"
+    : "e.g. Mercu Jalil, Unit B-21-17";
+  bookingSummaryLabel.textContent = isRoomRental
+    ? "Room Booking"
+    : "Unit Booking";
 
   setInvalid(
     propertyInput,
@@ -196,6 +258,7 @@ function updateCalculator() {
     rental,
     getSelectedPaymentStructure(),
     tenancyYears,
+    rentalType,
   );
   currentMessage = buildMessage(propertyName, rental, amounts);
   messagePreview.textContent = currentMessage;
@@ -209,6 +272,24 @@ function updateCalculator() {
 function formatRentalInput() {
   const rental = parseAmount(rentalInput.value);
   rentalInput.value = rental ? formatNumber(rental) : "";
+}
+
+function switchRentalType() {
+  rentalDrafts[activeRentalType] = {
+    propertyName: propertyInput.value,
+    monthlyRental: rentalInput.value,
+    paymentStructure: document.querySelector(
+      'input[name="paymentStructure"]:checked',
+    ).value,
+  };
+
+  activeRentalType = getSelectedRentalType();
+  propertyInput.value = rentalDrafts[activeRentalType].propertyName;
+  rentalInput.value = rentalDrafts[activeRentalType].monthlyRental;
+  document.querySelector(
+    `input[name="paymentStructure"][value="${rentalDrafts[activeRentalType].paymentStructure}"]`,
+  ).checked = true;
+  updateCalculator();
 }
 
 async function copyMessage() {
@@ -252,6 +333,9 @@ paymentStructureInputs.forEach((input) =>
 );
 tenancyPeriodInputs.forEach((input) =>
   input.addEventListener("change", updateCalculator),
+);
+rentalTypeInputs.forEach((input) =>
+  input.addEventListener("change", switchRentalType),
 );
 copyButton.addEventListener("click", copyMessage);
 
