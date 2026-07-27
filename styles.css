@@ -132,45 +132,12 @@ select {
   box-shadow: 0 0 0 4px rgba(18, 168, 125, 0.12);
 }
 
-.intro {
-  max-width: 750px;
-  padding: 60px 0 47px;
-}
-
-.eyebrow {
-  margin: 0 0 16px;
-  color: var(--green-700);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.intro h1 {
-  margin: 0;
-  font-family: "Manrope", sans-serif;
-  font-size: clamp(39px, 5.4vw, 66px);
-  line-height: 1.05;
-  letter-spacing: -0.05em;
-}
-
-.intro h1 span {
-  color: var(--green-600);
-}
-
-.intro-copy {
-  max-width: 640px;
-  margin: 23px 0 0;
-  color: var(--text-muted);
-  font-size: 17px;
-  line-height: 1.65;
-}
-
 .calculator-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
   gap: 24px;
   align-items: start;
+  margin-top: 32px;
 }
 
 .form-card,
@@ -738,10 +705,6 @@ footer {
 }
 
 @media (max-width: 860px) {
-  .intro {
-    padding-top: 39px;
-  }
-
   .calculator-grid {
     grid-template-columns: 1fr;
   }
@@ -758,19 +721,6 @@ footer {
 
   .status-pill {
     display: none;
-  }
-
-  .intro {
-    padding: 35px 4px 31px;
-  }
-
-  .intro h1 {
-    font-size: 38px;
-  }
-
-  .intro-copy {
-    margin-top: 17px;
-    font-size: 14px;
   }
 
   .form-card,
